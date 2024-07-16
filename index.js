@@ -104,6 +104,8 @@ app.post("/register", (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
 
+    console.log(username, password);
+
     // Check if both username and password are provided
     if (username && password) {
 
@@ -116,13 +118,13 @@ app.post("/register", (req, res) => {
             return res.status(404).json({message: "User already exists!"});
         }
     }
-    
+
     // Return error if username or password is missing
     return res.status(404).json({message: "Unable to register user."});
 });
 
 
-const PORT =5000;
+const PORT =5500;
 
 app.use("/friends", routes);
 
