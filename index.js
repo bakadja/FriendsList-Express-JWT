@@ -36,11 +36,11 @@ app.use(
     secret: "fingerpint",
     resave: true,
     saveUninitialized: true,
-    cookie: {
-      secure: true,
-      httpOnly: true,
-      maxAge: 3600000,
-    },
+    // cookie: {
+    //   secure: true,
+    //   httpOnly: true,
+    //   maxAge: 3600000,
+    // },
   })
 );
 
