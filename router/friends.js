@@ -50,9 +50,31 @@ router.get("/:email",(req,res)=>{
 
 
 // PUT request: Update the details of a friend with email id
-router.put("/:email", (req, res) => {
-  // Update the code here
-  res.send("Yet to be implemented")//This line is to be replaced with actual return value
+router.put("/:email", function(req, res) {
+  // Extract email parameter from request URL
+  const email = req.params.email;
+  let friend = friends[email];  // Retrieve friend object associated with email
+
+  if (friend) {  // Check if friend exists
+      const {firstName, lastName, DOB}  = req.body;
+    
+      // Update DOB if provided in request body
+      if(!firstName || !lastName || !DOB){
+        return res.status(400).send("Please provide firstName, lastName and DOB");
+      }
+
+      // Update friend details
+      friends[email] = {
+          ...friend,
+          firstName,
+          lastName,
+          DOB
+      };
+      res.send(`Friend with the email ${email} updated.`);
+  } else {
+      // Respond if friend with specified email is not found
+      res.send("Unable to find friend!");
+  }
 });
 
 
