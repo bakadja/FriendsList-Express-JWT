@@ -11,12 +11,10 @@ const doesExist = (username) => {
     let userswithsamename = users.filter((user) => {
         return user.username === username;
     });
+
     // Return true if any user with the same username is found, otherwise false
-    if (userswithsamename.length > 0) {
-        return true;
-    } else {
-        return false;
-    }
+    return userswithsamename.length > 0;
+   
 }
 
 // Check if the user with the given username and password exists
@@ -25,25 +23,39 @@ const authenticatedUser = (username, password) => {
     let validusers = users.filter((user) => {
         return (user.username === username && user.password === password);
     });
+    
     // Return true if any valid user is found, otherwise false
-    if (validusers.length > 0) {
-        return true;
-    } else {
-        return false;
-    }
+    return validusers.length > 0;
+
 }
 
 const app = express();
 
-app.use(session({secret:"fingerpint"},resave=true,saveUninitialized=true));
+app.use(
+  session({
+    secret: "fingerpint",
+    resave: true,
+    saveUninitialized: true,
+    cookie: {
+      secure: true,
+      httpOnly: true,
+      maxAge: 3600000,
+    },
+  })
+);
 
 app.use(express.json());
 
 // Middleware to authenticate requests to "/friends" endpoint
 app.use("/friends", function auth(req, res, next) {
+
     // Check if user is logged in and has valid access token
     if (req.session.authorization) {
-        let token = req.session.authorization['accessToken'];
+        let token = req.session.authorization?.accessToken;
+
+        if (!token) {
+            return res.status(403).json({ message: "User not authenticated" });
+        }
 
         // Verify JWT token
         jwt.verify(token, "access", (err, user) => {
@@ -71,6 +83,7 @@ app.post("/login", (req, res) => {
 
     // Authenticate user
     if (authenticatedUser(username, password)) {
+        
         // Generate JWT access token
         let accessToken = jwt.sign({
             data: password
@@ -93,6 +106,7 @@ app.post("/register", (req, res) => {
 
     // Check if both username and password are provided
     if (username && password) {
+
         // Check if the user does not already exist
         if (!doesExist(username)) {
             // Add the new user to the users array
@@ -102,6 +116,7 @@ app.post("/register", (req, res) => {
             return res.status(404).json({message: "User already exists!"});
         }
     }
+    
     // Return error if username or password is missing
     return res.status(404).json({message: "Unable to register user."});
 });
